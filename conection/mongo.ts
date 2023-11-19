@@ -2,7 +2,7 @@ const  mongoose = require('mongoose');
 
 const dbMongo = async() =>{
     try {
-        await mongoose.connect('mongodb+srv://luis:luis271103@cluster0.mjykr7w.mongodb.net/' );
+        await mongoose.connect('mongodb+srv://stagoace:123@cluster0.zcpe23d.mongodb.net/EventosPoli?retryWrites=true&w=majority' );
         
         console.log('DB MONGO ONLINE');
     } catch (error) {
@@ -11,4 +11,4 @@ const dbMongo = async() =>{
         
     }
 }
-export default  dbMongo
+export default dbMongo

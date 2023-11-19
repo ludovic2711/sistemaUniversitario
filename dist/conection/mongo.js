@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose = require('mongoose');
 const dbMongo = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield mongoose.connect('mongodb+srv://luis:luis271103@cluster0.mjykr7w.mongodb.net/');
+        yield mongoose.connect('mongodb+srv://stagoace:123@cluster0.zcpe23d.mongodb.net/EventosPoli?retryWrites=true&w=majority');
         console.log('DB MONGO ONLINE');
     }
     catch (error) {

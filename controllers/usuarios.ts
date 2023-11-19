@@ -1,24 +1,19 @@
 
 import { Request, Response } from 'express'
+import Empleado from '../models/empleado'
 
-export const getUsuarios = (req: Request, res: Response) => {
+export const getUsuarios = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const empleados = await Empleado.findAll();
 
-    res.json({
-        msg: 'getUsuarios'
-    })
-
-}
-
-export const getUsuario = (req: Request, res: Response) => {
-
-    const { id } = req.params;
-
-    res.json({
-        msg: 'getUsuarios',
-        id
-    })
-
-}
+        res.json({
+            empleados,
+        });
+    } catch (error) {
+        console.error('Error al obtener empleados:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+};
 
 export const postUsuario = (req: Request, res: Response) => {
 

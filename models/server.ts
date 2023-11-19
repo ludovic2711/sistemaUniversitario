@@ -1,6 +1,6 @@
 
 import express, { Application } from 'express';
-import userRoutes from '../routes/usuario';
+import userRoutes from '../routes/Eventos';
 import cors from 'cors'
 import db from '../conection/postgresSQL';
 import dbMongo from '../conection/mongo';
@@ -11,7 +11,7 @@ class Server {
     private app: Application;
     private port: string;
     private apiPaths = {
-        usuarios: '/api/usuarios'
+        usuarios: '/eventos'
     }
 
 
