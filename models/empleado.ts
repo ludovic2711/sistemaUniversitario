@@ -1,5 +1,6 @@
 import { DataTypes } from "sequelize";
 import db from "../conection/postgresSQL";
+import Ciudad from "./ciudad";
 
 const Empleado = db.define('Empleado', {
   identificacion: {
@@ -18,9 +19,18 @@ const Empleado = db.define('Empleado', {
   tipo_empleado: {
     type: DataTypes.STRING,
   },
+  lugar_nacimiento: {
+    type: DataTypes.INTEGER,
+  }
 }, {
   tableName: 'EMPLEADOS', // Nombre de la tabla en tu base de datos
-  timestamps: false, // Si no usas campos de marca de tiempo created_at y updated_at
+  timestamps: false,
+});
+
+// asociación entre Empleado y Ciudad
+Empleado.belongsTo(Ciudad, {
+  foreignKey: 'lugar_nacimiento',
+  as: 'ciudadNacimiento',
 });
 
 export default Empleado;

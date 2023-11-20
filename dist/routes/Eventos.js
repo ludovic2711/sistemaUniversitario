@@ -7,5 +7,6 @@ router.get('/all', eventos_1.getEventos);
 router.get('/:titulo', eventos_1.getEvento);
 router.post('/', eventos_1.postEvento);
 router.put("/:titulo", eventos_1.putEvento);
+router.put("/comment/:id", eventos_1.putEventoComentario);
 exports.default = router;
 //# sourceMappingURL=Eventos.js.map

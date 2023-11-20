@@ -9,16 +9,29 @@ const evento = new mongoose_1.default.Schema({
     descripcion: String,
     categorias: [String],
     fecha: String,
-    lugar: String,
-    facultadesOrganizadoras: [String],
+    lugar: {
+        nombre: String,
+        direccion: String,
+        ciudad: {
+            ciudad: String,
+            departamento: String,
+            pais: String,
+        }
+    },
+    facultadesOrganizadoras: [{ nombre: String,
+            ubicacion: String }],
+    programasOrganizadoras: [String],
     asistentes: [{ tipoAsistente: String,
             identificacion: String,
-            nombre: String,
-            apellidos: String,
+            nombreUsuario: String,
+            nombreCompleto: String,
+            relacionInstitucion: String,
             email: String,
-            tipo_empleado: String, }],
-    comentarios: [{ idPersona: String,
-            comentario: String }]
+            ciudad: String }],
+    comentarios: [{ usuario: String,
+            comentario: String,
+            idAsistente: String,
+        }]
 });
 module.exports = mongoose_1.default.model('evento', evento);
 //# sourceMappingURL=evento.js.map

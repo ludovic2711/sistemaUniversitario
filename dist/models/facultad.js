@@ -5,35 +5,30 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_1 = require("sequelize");
 const postgresSQL_1 = __importDefault(require("../conection/postgresSQL"));
-const ciudad_1 = __importDefault(require("./ciudad"));
-const Empleado = postgresSQL_1.default.define('Empleado', {
-    identificacion: {
-        type: sequelize_1.DataTypes.STRING,
+const Facultad = postgresSQL_1.default.define('FACULTADES', {
+    codigo: {
+        type: sequelize_1.DataTypes.INTEGER,
         primaryKey: true,
     },
-    nombres: {
+    nombre: {
         type: sequelize_1.DataTypes.STRING,
+        allowNull: false,
     },
-    apellidos: {
+    ubicacion: {
         type: sequelize_1.DataTypes.STRING,
+        allowNull: false,
     },
-    email: {
+    nro_telefono: {
         type: sequelize_1.DataTypes.STRING,
+        allowNull: false,
     },
-    tipo_empleado: {
+    id_decano: {
         type: sequelize_1.DataTypes.STRING,
+        allowNull: false,
     },
-    lugar_nacimiento: {
-        type: sequelize_1.DataTypes.INTEGER,
-    }
 }, {
-    tableName: 'EMPLEADOS',
+    tableName: 'FACULTADES',
     timestamps: false,
 });
-// asociación entre Empleado y Ciudad
-Empleado.belongsTo(ciudad_1.default, {
-    foreignKey: 'lugar_nacimiento',
-    as: 'ciudadNacimiento',
-});
-exports.default = Empleado;
-//# sourceMappingURL=empleado.js.map
+exports.default = Facultad;
+//# sourceMappingURL=facultad.js.map
