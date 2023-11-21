@@ -12,12 +12,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.putEventoComentario = exports.putEvento = exports.postEvento = exports.getEvento = exports.getEventos = void 0;
+exports.deleteEvento = exports.putEventoComentario = exports.putEvento = exports.postEvento = exports.getEvento = exports.getEventos = void 0;
 const empleado_1 = __importDefault(require("../models/empleado"));
 const ciudad_1 = __importDefault(require("../models/ciudad"));
 const departamento_1 = __importDefault(require("../models/departamento"));
 const pais_1 = __importDefault(require("../models/pais"));
 const facultad_1 = __importDefault(require("../models/facultad"));
+const programa_1 = __importDefault(require("../models/programa"));
 const evento = require('../models/evento');
 const getEventos = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -39,8 +40,26 @@ const getEvento = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const titulo = req.params.titulo;
         const eventoEncontrado = yield evento.findOne({ titulo: titulo }, '_id titulo facultadesOrganizadoras programasOrganizadoras asistentes');
         if (eventoEncontrado) {
+            const asistentes = eventoEncontrado.asistentes;
+            // Filtrar los asistentes
+            const asistentesFiltrados = asistentes.filter((asistente) => {
+                return asistente.tipoAsistente === 'Facilitador' || asistente.tipoAsistente === 'Asistente';
+            });
+            for (const asistente of asistentesFiltrados) {
+                const empleado = yield empleado_1.default.findByPk(asistente.identificacion);
+                if (empleado) {
+                    asistente.nombreCompleto = empleado.dataValues.nombres + " " + empleado.dataValues.apellidos;
+                    asistente.email = empleado.dataValues.email;
+                    asistente.relacionInstitucion = empleado.dataValues.tipo_empleado;
+                    const ciudad = yield ciudad_1.default.findByPk(empleado.dataValues.lugar_nacimiento);
+                    if (ciudad) {
+                        asistente.ciudad = ciudad.dataValues.nombre;
+                    }
+                }
+            }
+            eventoEncontrado.asistentes = asistentesFiltrados;
             res.json({
-                evento: eventoEncontrado,
+                evento: eventoEncontrado
             });
         }
         else {
@@ -76,8 +95,18 @@ const postEvento = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             }
             else {
                 return res.json({
-                    message: "El programa no existe en la institucion"
+                    message: "La facultad no existe en la institucion"
                 });
+            }
+        }
+        if (programasOrganizadoras) {
+            for (const programa of programasOrganizadoras) {
+                const programaEncontrado = yield programa_1.default.findOne({ where: { nombre: programa.nombre } });
+                if (!programaEncontrado) {
+                    return res.json({
+                        message: "El programa no existe en la institucion"
+                    });
+                }
             }
         }
         let nombreCiudad = lugar.ciudad.ciudad;
@@ -127,6 +156,7 @@ function obtenerFechaActual() {
     const fechaFormateada = `${year}-${month}-${day}`;
     return fechaFormateada;
 }
+;
 const putEvento = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { titulo } = req.params;
     const { body } = req;
@@ -249,4 +279,10 @@ const putEventoComentario = (req, res) => __awaiter(void 0, void 0, void 0, func
     }
 });
 exports.putEventoComentario = putEventoComentario;
+const deleteEvento = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { titulo } = req.params;
+    const resultado = yield evento.deleteOne({ titulo: titulo });
+    res.json({ resultado });
+});
+exports.deleteEvento = deleteEvento;
 //# sourceMappingURL=eventos.js.map

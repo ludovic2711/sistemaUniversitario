@@ -5,6 +5,7 @@ import Ciudad from '../models/ciudad';
 import Departamento from '../models/departamento';
 import Pais from '../models/pais';
 import Facultad from '../models/facultad';
+import Programa from '../models/programa';
 const evento = require('../models/evento')
 
 export const getEventos = async (req: Request, res: Response) => {
@@ -29,9 +30,33 @@ export const getEvento = async (req: Request, res: Response) => {
        const eventoEncontrado = await evento.findOne({ titulo: titulo }, '_id titulo facultadesOrganizadoras programasOrganizadoras asistentes');
 
        if (eventoEncontrado) {
+            const asistentes = eventoEncontrado.asistentes;
+            
+
+            // Filtrar los asistentes
+            const asistentesFiltrados = asistentes.filter((asistente: Asistente) => {
+                return asistente.tipoAsistente === 'Facilitador' || asistente.tipoAsistente === 'Asistente';
+            });
+
+            for(const asistente of asistentesFiltrados){
+                const empleado = await Empleado.findByPk(asistente.identificacion);
+
+                if (empleado){
+                    asistente.nombreCompleto = empleado.dataValues.nombres + " " + empleado.dataValues.apellidos;
+                    asistente.email = empleado.dataValues.email;
+                    asistente.relacionInstitucion = empleado.dataValues.tipo_empleado;
+                    
+                    const ciudad = await Ciudad.findByPk(empleado.dataValues.lugar_nacimiento);
+                    if (ciudad){
+                        asistente.ciudad = ciudad.dataValues.nombre;
+                    }
+                }
+            }
+
+            eventoEncontrado.asistentes = asistentesFiltrados;
 
             res.json({
-                evento: eventoEncontrado,
+                evento: eventoEncontrado
             });
         } else {
             res.json({ mensaje: 'Evento no encontrado' });
@@ -43,6 +68,15 @@ export const getEvento = async (req: Request, res: Response) => {
     }
 };
 
+interface Asistente {
+    tipoAsistente: string;
+    identificacion: string;
+    nombreUsuario: string;
+    nombreCompleto: string;
+    relacionInstitucion: string;
+    email: string;
+    ciudad: string;
+}
 
 export const postEvento = async (req: Request, res: Response) => {
 
@@ -71,8 +105,20 @@ export const postEvento = async (req: Request, res: Response) => {
                 facultad.ubicacion = facultadEncontrado.dataValues.ubicacion;
             } else {
                 return res.json({
-                    message: "El programa no existe en la institucion"
+                    message: "La facultad no existe en la institucion"
                 })
+            }
+        }
+
+        if(programasOrganizadoras){
+            for(const programa of programasOrganizadoras) {
+                const programaEncontrado = await Programa.findOne({where: {nombre: programa.nombre}});
+    
+                if(!programaEncontrado){
+                    return res.json({
+                        message: "El programa no existe en la institucion"
+                    })
+                }
             }
         }
 
@@ -116,7 +162,7 @@ export const postEvento = async (req: Request, res: Response) => {
         res.status(500).json({ error: 'Error interno del servidor' });
     }
 
-}
+};
 
 function obtenerFechaActual(): string {
     const fechaActual = new Date();
@@ -130,7 +176,7 @@ function obtenerFechaActual(): string {
     const fechaFormateada = `${year}-${month}-${day}`;
 
     return fechaFormateada;
-}
+};
 
 export const putEvento = async (req: Request, res: Response) => {
 
@@ -235,7 +281,7 @@ export const putEvento = async (req: Request, res: Response) => {
         })
     }
 
-}
+};
 
 export const putEventoComentario = async (req: Request, res: Response) => {
 
@@ -273,5 +319,20 @@ export const putEventoComentario = async (req: Request, res: Response) => {
         res.status(500).json({ error: 'Error interno del servidor' });
     }
 
-}
+};
 
+
+export const deleteEvento = async (req: Request, res: Response) => {
+
+    const { titulo } = req.params;
+
+    const resultado = await evento.deleteOne({titulo: titulo});
+
+    if(resultado.acknowledged){
+        res.json({resultado, "estado": 'Se elimino correctamente'})
+    } else {
+        res.json({"estado": 'Elemento no encontrado en la BDNoSQL'})
+    }
+    
+
+}
